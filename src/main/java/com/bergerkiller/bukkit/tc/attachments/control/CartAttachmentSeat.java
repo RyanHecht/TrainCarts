@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.tc.attachments.control;
 
+import com.bergerkiller.bukkit.tc.attachments.ui.MapWidgetNumberBox;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -92,6 +93,29 @@ public class CartAttachmentSeat extends CartAttachment {
                     tab.getParent().getParent().addWidget(new SeatExitPositionMenu()).setAttachment(attachment);
                 }
             }).setText("Change Exit").setBounds(0, 30, 100, 16);
+
+            tab.addWidget(new MapWidgetNumberBox() {
+                @Override
+                public void onAttached() {
+                    super.onAttached();
+                    this.setRange(0, Integer.MAX_VALUE);
+                    this.setIncrement(1);
+                    this.setValue(attachment.getConfig().get("enterPriority", 5));
+                    this.setTextOverride("Enter Priority: " + (int) getValue() + "");
+                }
+
+                @Override
+                public String getAcceptedPropertyName() {
+                    return "Enter Priority";
+                }
+
+                @Override
+                public void onValueChanged() {
+                    attachment.getConfig().set("enterPriority", (int) getValue());
+                    this.setTextOverride("Enter Priority: " + (int) getValue() + "");
+                }
+
+            }).setBounds(-7, 50, 114, 16);
         }
     };
 
