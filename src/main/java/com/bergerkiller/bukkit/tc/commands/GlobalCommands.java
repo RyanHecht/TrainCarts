@@ -125,35 +125,24 @@ public class GlobalCommands {
             }
 
             // Get editor instance
-            MapDisplay display = MapDisplay.getHeldDisplay((Player) sender, AttachmentEditor.class);
-            if (display == null) {
-                display = MapDisplay.getHeldDisplay((Player) sender);
-                if (display == null) {
-                    sender.sendMessage(ChatColor.RED + "You do not have an editor menu open");
-                    return true;
-                }
+            AttachmentEditor editor = MapDisplay.getHeldDisplay((Player) sender, AttachmentEditor.class);
+            if (editor == null) {
+                sender.sendMessage(ChatColor.RED + "You do not have the attachment editor open");
             }
 
             // Find focused widget
-            MapWidget focused = display.getFocusedWidget();
-            if (!(focused instanceof SetValueTarget)) {
-                focused = display.getActivatedWidget();
+            MapWidget focused = editor.getFocusedWidget();
+            if (focused == null) {
+                focused = editor.getActivatedWidget();
             }
-            if (!(focused instanceof SetValueTarget)) {
-                sender.sendMessage(ChatColor.RED + "No suitable menu item is active!");
-                return true;
-            }
-
-            // Got a target, input the value into it
-            SetValueTarget target = (SetValueTarget) focused;
-            if (args[1].equals("set")) {
+            if (args[1].equals("set") && focused instanceof SetValueTarget) {
                 String fullValue = args[2];
                 for (int n = 3; n < args.length; n++) {
                     fullValue += " " + args[n];
                 }
 
-                boolean success = target.acceptTextValue(fullValue);
-                String propname = target.getAcceptedPropertyName();
+                boolean success = ((SetValueTarget) focused).acceptTextValue(fullValue);
+                String propname = ((SetValueTarget) focused).getAcceptedPropertyName();
                 if (success) {
                     sender.sendMessage(ChatColor.GREEN + propname + " has been updated");
                 } else {
@@ -162,7 +151,7 @@ public class GlobalCommands {
                 return true;
             }
 
-            sender.sendMessage(ChatColor.RED + "Unknown command! Try /train menu set [value]");
+            sender.sendMessage(ChatColor.RED + "Unknown command or no suitable menu item is active!");
             return true;
         } else if (args[0].equals("reroute")) {
             Permission.COMMAND_REROUTE.handle(sender);
