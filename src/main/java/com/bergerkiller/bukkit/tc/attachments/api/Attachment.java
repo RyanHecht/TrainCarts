@@ -265,7 +265,7 @@ public interface Attachment {
     default void setActive(boolean active) {
         AttachmentInternalState state = this.getInternalState();
         if (state.active != active) {
-            state.active = active;
+            state.active = true;
             if (!HelperMethods.hasInactiveParent(this)) {
                 HelperMethods.updateActiveRecursive(this, active, this.getViewers());
             }
