@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.tc.TCConfig;
 import com.bergerkiller.bukkit.tc.Util;
 import com.bergerkiller.bukkit.tc.controller.MinecartMember;
-import com.bergerkiller.bukkit.tc.rails.logic.RailLogicHorizontal;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -211,17 +210,7 @@ public abstract class RailTypeHorizontal extends RailType {
                 orientation = direction.getOppositeFace();
             }
         }
-
-        Location at = this.findMinecartPos(railsBlock).getLocation();
-        at.setDirection(FaceUtil.faceToVector(orientation));
-        if (this.isUpsideDown(railsBlock)) {
-            at.add(0.5, 1.0 + RailLogicHorizontal.Y_POS_OFFSET_UPSIDEDOWN, 0.5);
-            at.setPitch(-180.0F);
-        } else {
-            at.add(0.5, RailLogicHorizontal.Y_POS_OFFSET, 0.5);
-            at.setPitch(0.0F);
-        }
-        return at;
+        return super.getSpawnLocation(railsBlock, orientation);
     }
 
     @Override

@@ -267,7 +267,7 @@ public abstract class MinecartMemberStore {
             throw new IllegalArgumentException("No suitable MinecartMember type for " + type);
         }
         CommonEntity.spawn(type, at, controller, createNetworkController());
-        controller.setDirectionForward();
+        controller.invalidateDirection();
         controller.updateDirection();
         MinecartMember<?> result = MemberSpawnEvent.call(controller).getMember();
         result.setUnloaded(false);

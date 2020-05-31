@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.tc.rails.type;
 
 import com.bergerkiller.bukkit.common.Timings;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.tc.TCTimings;
@@ -17,6 +18,7 @@ import com.bergerkiller.bukkit.tc.controller.components.RailState;
 import com.bergerkiller.bukkit.tc.editor.RailsTexture;
 import com.bergerkiller.bukkit.tc.rails.logic.RailLogic;
 import com.bergerkiller.bukkit.tc.rails.logic.RailLogicAir;
+import com.bergerkiller.bukkit.tc.rails.logic.RailLogicHorizontal;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -601,7 +603,18 @@ public abstract class RailType {
      * @param orientation horizontal orientation of the one that placed the minecart
      * @return spawn location
      */
-    public abstract Location getSpawnLocation(Block railsBlock, BlockFace orientation);
+    public Location getSpawnLocation(Block railsBlock, BlockFace orientation) {
+        Location at = this.findMinecartPos(railsBlock).getLocation();
+        if (this.isUpsideDown(railsBlock)) {
+            at.add(0.5, 1.0 + RailLogicHorizontal.Y_POS_OFFSET_UPSIDEDOWN, 0.5);
+            at.setPitch(-180.0F);
+        } else {
+            at.add(0.5, RailLogicHorizontal.Y_POS_OFFSET, 0.5);
+            at.setPitch(0.0F);
+        }
+        at.setYaw(FaceUtil.faceToYaw(orientation));
+        return at;
+    }
 
     /**
      * Gets rails texture information about this Rail Type for a particular Block.
