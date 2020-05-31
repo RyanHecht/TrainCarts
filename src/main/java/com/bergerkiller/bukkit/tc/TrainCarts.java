@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.tc.commands.Commands;
 import com.bergerkiller.bukkit.tc.controller.*;
 import com.bergerkiller.bukkit.tc.detector.DetectorRegion;
 import com.bergerkiller.bukkit.tc.itemanimation.ItemAnimation;
+import com.bergerkiller.bukkit.tc.pathfinding.PathNode;
 import com.bergerkiller.bukkit.tc.pathfinding.PathProvider;
 import com.bergerkiller.bukkit.tc.portals.TCPortalManager;
 import com.bergerkiller.bukkit.tc.properties.CartPropertiesStore;
@@ -544,6 +545,7 @@ public class TrainCarts extends PluginBase {
         }
 
         // Deinit classes
+        PathNode.deinit();
         ArrivalSigns.deinit();
         SignActionSpawn.deinit();
         Statement.deinit();

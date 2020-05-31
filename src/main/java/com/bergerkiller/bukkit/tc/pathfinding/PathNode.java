@@ -111,6 +111,10 @@ public class PathNode {
         return maxDistance;
     }
 
+    public static void deinit() {
+        clearAll();
+    }
+
     /**
      * Gets the world which this node is part of
      * 

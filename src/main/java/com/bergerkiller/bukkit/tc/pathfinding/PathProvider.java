@@ -94,10 +94,6 @@ public class PathProvider extends Task {
 
     public void disable() {
         this.stop();
-
-        for (PathWorld world : this.getWorlds()) {
-            world.clearAll();
-        }
     }
 
     public void save(boolean autosave, String filename) {
