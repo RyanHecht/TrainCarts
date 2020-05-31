@@ -20,7 +20,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 public class RailTypeVertical extends RailType {
-    private static final BlockFace[] SIGN_TRIGGER_DIRS = {BlockFace.UP, BlockFace.DOWN};
 
     @Override
     public boolean isRail(BlockData blockData) {
@@ -110,11 +109,6 @@ public class RailTypeVertical extends RailType {
     @Override
     public BlockFace getSignColumnDirection(Block railsBlock) {
         return Util.getVerticalRailDirection(railsBlock);
-    }
-
-    @Override
-    public BlockFace[] getSignTriggerDirections(Block railBlock, Block signBlock, BlockFace signFacing) {
-        return SIGN_TRIGGER_DIRS;
     }
 
     @Override

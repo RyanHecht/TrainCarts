@@ -19,7 +19,6 @@ import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.tc.Util;
-import com.bergerkiller.bukkit.tc.controller.components.RailPiece;
 import com.bergerkiller.bukkit.tc.rails.type.RailType;
 
 /**
@@ -30,7 +29,7 @@ public class RailSignCache {
     private static final Material SIGN_POST_TYPE = getMaterial("LEGACY_SIGN_POST");
     private static BlockFace[] SIGN_FACES_ORDERED = {BlockFace.UP, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.DOWN};
     private static final TrackedSign[] EMPTY_SIGNS = new TrackedSign[0];
-    private static final HashMap<RailPiece, CachedRailSignList> cachedRailSigns = new HashMap<RailPiece, CachedRailSignList>();
+    private static final HashMap<CachedRailKey, CachedRailSignList> cachedRailSigns = new HashMap<CachedRailKey, CachedRailSignList>();
     private static final List<Block> signListCache = new ArrayList<Block>();
 
     /**
@@ -41,26 +40,17 @@ public class RailSignCache {
      * @return array of valid rails at a rails block position
      */
     public static TrackedSign[] getSigns(RailType railType, Block railBlock) {
-        return getSigns(RailPiece.create(railType, railBlock));
-    }
-
-    /**
-     * Gets all the cached rail signs available at a particular block position
-     * 
-     * @param rail The rail to find signs at
-     * @return array of valid rails at a rails block position
-     */
-    public static TrackedSign[] getSigns(RailPiece rail) {
-        CachedRailSignList list = cachedRailSigns.computeIfAbsent(rail,
-                key -> new CachedRailSignList(discoverSigns(key)));
+        CachedRailKey in_key = new CachedRailKey(railType, railBlock);
+        CachedRailSignList list = cachedRailSigns.computeIfAbsent(in_key,
+                key -> new CachedRailSignList(discoverSigns(key.railType, key.railBlock)));
 
         // If more than a tick old, verify the signs, and re-discover if incorrect
         if (list.life > 0) {
             if (verifySigns(list.signs)) {
                 list.life = 0;
             } else {
-                list = new CachedRailSignList(discoverSigns(rail));
-                cachedRailSigns.put(rail, list);
+                list = new CachedRailSignList(discoverSigns(in_key.railType, in_key.railBlock));
+                cachedRailSigns.put(in_key, list);
             }
         }
 
@@ -77,25 +67,12 @@ public class RailSignCache {
      * @return signs belonging to this rail
      */
     public static TrackedSign[] discoverSigns(RailType railType, Block railBlock) {
-        return discoverSigns(RailPiece.create(railType, railBlock));
-    }
-
-    /**
-     * Discovers the signs belonging to a particular rail.
-     * Unlike {@link #getSigns(rail)} this method does not look
-     * the information up from a cache
-     * 
-     * @param railType of the rail
-     * @param railBlock of the rail
-     * @return signs belonging to this rail
-     */
-    public static TrackedSign[] discoverSigns(RailPiece rail) {
-        Block columnStart = rail.type().getSignColumnStart(rail.block());
+        Block columnStart = railType.getSignColumnStart(railBlock);
         if (columnStart == null) {
             return EMPTY_SIGNS;
         }
 
-        BlockFace direction = rail.type().getSignColumnDirection(rail.block());
+        BlockFace direction = railType.getSignColumnDirection(railBlock);
         if (direction == null || direction == BlockFace.SELF) {
             return EMPTY_SIGNS;
         }
@@ -107,7 +84,7 @@ public class RailSignCache {
             if (!signListCache.isEmpty()) {
                 signs = new TrackedSign[signListCache.size()];
                 for (int i = 0; i < signs.length; i++) {
-                    signs[i] = new TrackedSign(signListCache.get(i), rail);
+                    signs[i] = new TrackedSign(signListCache.get(i), railType, railBlock);
                 }
             }
         } finally {
@@ -126,15 +103,9 @@ public class RailSignCache {
         return true;
     }
 
-    /**
-     * Gets the rails type and rails block that are linked with a given sign block
-     * 
-     * @param signblock
-     * @return rails piece information, NONE if the sign has no rails (rail block is null)
-     */
-    public static RailPiece getRailsFromSign(Block signblock) {
+    public static Block getRailsFromSign(Block signblock) {
         if (signblock == null) {
-            return RailPiece.NONE;
+            return null;
         }
 
         BlockData signblock_data = WorldUtil.getBlockData(signblock);
@@ -144,13 +115,12 @@ public class RailSignCache {
         } else if (signblock_data.isType(SIGN_POST_TYPE)) {
             mainBlock = signblock;
         } else {
-            return RailPiece.NONE;
+            return null;
         }
 
         // Check main block IS rails itself
-        RailType railType = RailType.getType(mainBlock);
-        if (railType != RailType.NONE) {
-            return RailPiece.create(railType, mainBlock);
+        if (RailType.getType(mainBlock) != RailType.NONE) {
+            return mainBlock;
         }
 
         // Look further in all 6 possible directions
@@ -163,10 +133,9 @@ public class RailSignCache {
                 block = block.getRelative(dir);
 
                 // Check for rails
-                railType = RailType.getType(block);
-                BlockFace columnDir = railType.getSignColumnDirection(block);
+                BlockFace columnDir = RailType.getType(block).getSignColumnDirection(block);
                 if (dir == columnDir.getOppositeFace()) {
-                    return RailPiece.create(railType, block);
+                    return block;
                 }
 
                 // End of the loop?
@@ -178,7 +147,7 @@ public class RailSignCache {
                 hasSigns = Util.hasAttachedSigns(block);
             }
         }
-        return RailPiece.NONE;
+        return null;
     }
 
     // removes all cached signs, forcing a global recalculation
@@ -235,16 +204,14 @@ public class RailSignCache {
     public static class TrackedSign {
         public final Sign sign;
         public final Block signBlock;
-        public final RailPiece rail;
         public final RailType railType;
         public final Block railBlock;
 
-        public TrackedSign(Block signBlock, RailPiece rail) {
+        public TrackedSign(Block signBlock, RailType railType, Block railBlock) {
             this.sign = BlockUtil.getSign(signBlock);
             this.signBlock = signBlock;
-            this.rail = rail;
-            this.railType = rail.type();
-            this.railBlock = rail.block();
+            this.railType = railType;
+            this.railBlock = railBlock;
         }
 
         @Override
@@ -255,6 +222,36 @@ public class RailSignCache {
         @Override
         public boolean equals(Object o) {
             return ((TrackedSign) o).signBlock.equals(this.signBlock);
+        }
+    }
+
+    private static final class CachedRailKey {
+        public final RailType railType;
+        public final Block railBlock;
+
+        public CachedRailKey(RailType railType, Block railBlock) {
+            this.railType = railType;
+            this.railBlock = railBlock;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 17;
+            hash = hash * 31 + System.identityHashCode(this.railBlock.getWorld());
+            hash = hash * 31 + this.railBlock.getX();
+            hash = hash * 31 + this.railBlock.getY();
+            hash = hash * 31 + this.railBlock.getZ();
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            CachedRailKey other = (CachedRailKey) o;
+            return this.railBlock.getWorld() == other.railBlock.getWorld() &&
+                   this.railBlock.getX() == other.railBlock.getX() &&
+                   this.railBlock.getY() == other.railBlock.getY() &&
+                   this.railBlock.getZ() == other.railBlock.getZ() &&
+                   this.railType == other.railType;
         }
     }
 

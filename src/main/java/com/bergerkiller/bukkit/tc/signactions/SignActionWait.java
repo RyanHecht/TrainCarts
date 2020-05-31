@@ -70,7 +70,7 @@ public class SignActionWait extends SignAction {
                             continue;
                         }
 
-                        SignActionEvent found = new SignActionEvent(sign.signBlock, sign.rail, info.getGroup());
+                        SignActionEvent found = new SignActionEvent(sign.signBlock, sign.railBlock, info.getGroup());
                         if (found.isType(distanceData)) {
                             distance = walkingPoint.movedTotal;
                             break walk;
