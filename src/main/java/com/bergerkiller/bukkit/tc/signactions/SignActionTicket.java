@@ -8,7 +8,6 @@ import com.bergerkiller.bukkit.tc.controller.MinecartMember;
 import com.bergerkiller.bukkit.tc.events.SignActionEvent;
 import com.bergerkiller.bukkit.tc.events.SignChangeActionEvent;
 import com.bergerkiller.bukkit.tc.properties.TrainProperties;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -29,11 +28,9 @@ public class SignActionTicket extends SignAction {
 
     @Override
     public void execute(SignActionEvent info) {
-        Economy economy = TrainCarts.plugin.getEconomy();
-        if (economy == null) {
+        if (TrainCarts.getEconomy() == null) {
             return;
         }
-
 
         final boolean isTrain;
         if (info.isCartSign() && info.isAction(SignActionType.MEMBER_ENTER, SignActionType.REDSTONE_ON)) {
@@ -63,13 +60,13 @@ public class SignActionTicket extends SignAction {
 
                 for (Player player : member.getEntity().getPlayerPassengers()) {
                     if (mode.equalsIgnoreCase("add") && money > 0) {
-                        economy.depositPlayer(player, money);
+                        TrainCarts.getEconomy().depositPlayer(player, money);
                         Localization.TICKET_ADD.message(player, TrainCarts.getCurrencyText(money));
                     } else if (mode.equalsIgnoreCase("check")) {
-                        Localization.TICKET_CHECK.message(player, TrainCarts.getCurrencyText(economy.getBalance(player)));
+                        Localization.TICKET_CHECK.message(player, TrainCarts.getCurrencyText(TrainCarts.getEconomy().getBalance(player)));
                     } else if ((mode.equalsIgnoreCase("buy") || mode.equalsIgnoreCase("pay")) && money > 0) {
-                        if (economy.has(player, money)) {
-                            economy.withdrawPlayer(player, money);
+                        if (TrainCarts.getEconomy().has(player, money)) {
+                            TrainCarts.getEconomy().withdrawPlayer(player, money);
                             Localization.TICKET_BUY.message(player, TrainCarts.getCurrencyText(money));
                             if (mode.equalsIgnoreCase("pay")) {
                                 Set<String> owners = member.getProperties().getOwners();
@@ -78,7 +75,7 @@ public class SignActionTicket extends SignAction {
                                     for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
                                         for (String owner : owners) {
                                             if (owner.equalsIgnoreCase(offlinePlayer.getName())) {
-                                                economy.depositPlayer(offlinePlayer, ownerMoney);
+                                                TrainCarts.getEconomy().depositPlayer(offlinePlayer, ownerMoney);
                                                 if (offlinePlayer.isOnline()) {
                                                     Localization.TICKET_BUYOWNER.message(offlinePlayer.getPlayer(), player.getDisplayName(), TrainCarts.getCurrencyText(money), member.getProperties().getTrainProperties().getTrainName());
                                                 }
