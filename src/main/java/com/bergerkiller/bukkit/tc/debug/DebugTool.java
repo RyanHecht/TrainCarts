@@ -9,6 +9,7 @@ import java.util.Random;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -85,11 +86,7 @@ public class DebugTool {
             public void run() {
                 Random r = new Random();
                 for (MutexZone zone : zones) {
-                    if (zone.slot.isAnonymous()) {
-                        r.setSeed(MathUtil.longHashToLong(zone.start.hashCode(), zone.end.hashCode()));
-                    } else {
-                        r.setSeed(zone.slot.getName().hashCode());
-                    }
+                    r.setSeed(MathUtil.longHashToLong(zone.start.hashCode(), zone.end.hashCode()));
                     java.awt.Color awt_color = java.awt.Color.getHSBColor(r.nextFloat(), 1.0f, 1.0f);
                     Color color = Color.fromRGB(awt_color.getRed(), awt_color.getGreen(), awt_color.getBlue());
                     double x1 = zone.start.x;
