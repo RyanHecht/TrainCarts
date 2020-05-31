@@ -206,10 +206,6 @@ public class StoredTrainItemUtil {
 
         // Find locations to spawn at
         List<Location> locations = SignActionSpawn.getSpawnPositions(spawnLoc, false, orientation, group.getMembers());
-        if (locations.isEmpty() && group.getMembers().size() == 1) {
-            // Spawn at the exact location
-            locations.add(spawnLoc);
-        }
         if (locations.size() < group.getMembers().size()) {
             return SpawnResult.FAIL_BLOCKED;
         }
