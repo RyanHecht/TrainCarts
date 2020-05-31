@@ -362,7 +362,7 @@ public class Station {
      */
     public void waitTrain(long delay) {
         ActionTrackerGroup actions = info.getGroup().getActions();
-        if (TCConfig.playHissWhenStopAtStation) {
+        if (TCConfig.playSoundAtStation) {
             actions.addActionSizzle().addTag(this.getTag());
         }
         if (TCConfig.refillAtStations) {

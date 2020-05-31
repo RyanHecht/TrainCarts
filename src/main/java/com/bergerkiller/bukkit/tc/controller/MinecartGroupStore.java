@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.tc.controller;
 
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
-import com.bergerkiller.bukkit.tc.TCConfig;
 import com.bergerkiller.bukkit.tc.TrainCarts;
 import com.bergerkiller.bukkit.tc.Util;
 import com.bergerkiller.bukkit.tc.controller.spawnable.SpawnableGroup;
@@ -252,9 +251,7 @@ public class MinecartGroupStore extends ArrayList<MinecartMember<?>> {
             g2.getSignTracker().updatePosition();
 
             g1.remove();
-            if (TCConfig.playHissWhenLinked) {
-                m2.playLinkEffect();
-            }
+            m2.playLinkEffect();
             return true;
         }
         return false;
