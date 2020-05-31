@@ -14,8 +14,6 @@ import org.bukkit.block.BlockFace;
 
 public abstract class RailTypeHorizontal extends RailType {
 
-    public abstract BlockFace getRailDirection(Block railBlock);
-
     @Override
     public Block findMinecartPos(Block trackBlock) {
         if (isUpsideDown(trackBlock)) {
@@ -47,7 +45,7 @@ public abstract class RailTypeHorizontal extends RailType {
         if (upsideDown) {
 
             // Directly before and after, or same block, on the same height level
-            BlockFace railDir = this.getRailDirection(railsBlock);
+            BlockFace railDir = this.getDirection(railsBlock);
             Block blockFwd = posBlock.getRelative(railDir);
             if (BlockUtil.equals(posBlock, hitBlock) || BlockUtil.equals(blockFwd, hitBlock)) {
                 return true;
@@ -92,7 +90,7 @@ public abstract class RailTypeHorizontal extends RailType {
             if (posBlock.getY() == hitBlock.getY()) {
                 // If the hit face is not a valid direction to go to, ignore it, except if this rail is sub-cardinal
                 if (Math.abs(dx) > 0 && Math.abs(dz) > 0) {
-                    BlockFace railDir = this.getRailDirection(railsBlock);
+                    BlockFace railDir = this.getDirection(railsBlock);
                     if (FaceUtil.isSubCardinal(railDir)) {
                         BlockFace f = FaceUtil.rotate(railDir, 2);
                         BlockFace hitDir = null;
@@ -149,7 +147,7 @@ public abstract class RailTypeHorizontal extends RailType {
                 }
 
                 // Cancel collisions with blocks at the heading of sloped rails when going up vertically
-                BlockFace railDirection = this.getRailDirection(railsBlock);
+                BlockFace railDirection = this.getDirection(railsBlock);
                 if (hitToFace == railDirection) {
                     // Going up a vertical rail? Check here.
                     if (Util.isVerticalAbove(posBlock, railDirection)) {
@@ -227,7 +225,7 @@ public abstract class RailTypeHorizontal extends RailType {
 
         // Hitting a block above the minecart, going up a slope
         if (member.isOnSlope() && delta.x == 0 && delta.z == 0 && delta.y == 1) {
-            if (direction == this.getRailDirection(railsBlock)) {
+            if (direction == this.getDirection(railsBlock)) {
                 return true;
             }
         }

@@ -143,7 +143,7 @@ public class SignActionSpawn extends SignAction {
             if (launchDirection == BlockFace.SELF) {
                 if (modes.size() >= 2) {
                     // Centering is possible; more than one direction can be spawned
-                    if (info.isRailsVertical()) {
+                    if (FaceUtil.isVertical(info.getRailDirection())) {
                         if (centerMode == CenterMode.LEFT) {
                             launchDirection = BlockFace.DOWN;
                         } else if (centerMode == CenterMode.RIGHT) {
@@ -211,7 +211,7 @@ public class SignActionSpawn extends SignAction {
                 // Spawn direction from center mode. Default to the launch direction.
                 SpawnPositions selectedMode = modes.get(0);
                 BlockFace spawnDirection = launchDirection;
-                if (info.isRailsVertical()) {
+                if (FaceUtil.isVertical(info.getRailDirection())) {
                     // Up/down of the sign
                     if (centerMode == CenterMode.LEFT) {
                         spawnDirection = BlockFace.DOWN;

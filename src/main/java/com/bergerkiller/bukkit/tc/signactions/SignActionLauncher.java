@@ -52,7 +52,7 @@ public class SignActionLauncher extends SignAction {
             }
         } else if (info.hasRailedMember()) {
             // Parse the direction to launch into
-            BlockFace direction = Direction.parse(info.getLine(3)).getDirection(info.getFacing(), info.getCartEnterFace());
+            BlockFace direction = Direction.parse(info.getLine(3)).getDirection(info.getFacing(), info.getCartDirection());
 
             // Calculate the launch distance if left empty
             if (!launchConfig.hasDistance() && !launchConfig.hasDuration()) {

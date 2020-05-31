@@ -29,6 +29,7 @@ public class Station {
     private final BlockFace instruction;
     private final Direction nextDirection;
     private final boolean valid;
+    private final BlockFace railDirection;
     private final Block railsBlock;
     private boolean wasCentered = false;
     private double centerOffset = 0.0;
@@ -53,7 +54,8 @@ public class Station {
         this.launchForce = parsedLaunchForce;
 
         // Vertical or horizontal rail logic
-        if (info.isRailsVertical()) {
+        this.railDirection = info.getRailDirection();
+        if (FaceUtil.isVertical(this.railDirection)) {
             // Up, down or center based on redstone power
             boolean up = info.isPowered(BlockFace.UP);
             boolean down = info.isPowered(BlockFace.DOWN);
@@ -67,47 +69,51 @@ public class Station {
                 this.instruction = null;
             }
         } else {
-            Vector railDirection = info.getCartEnterDirection();
-            if (Util.isDiagonal(railDirection)) {
+            if (FaceUtil.isSubCardinal(this.railDirection) && FaceUtil.isSubCardinal(info.getFacing())) {
                 // Sub-cardinal checks: Both directions have two possible powered sides
-                BlockFace face_x = (railDirection.getX() > 0.0) ? BlockFace.EAST : BlockFace.WEST;
-                BlockFace face_z = (railDirection.getZ() > 0.0) ? BlockFace.SOUTH : BlockFace.NORTH;
-                boolean pow1 = info.isPowered(face_x) || info.isPowered(face_z);
-                boolean pow2 = info.isPowered(face_x.getOppositeFace()) || info.isPowered(face_z.getOppositeFace());
+                final BlockFace[] faces = FaceUtil.getFaces(this.railDirection);
+                boolean pow1 = info.isPowered(faces[0]) || info.isPowered(faces[1].getOppositeFace());
+                boolean pow2 = info.isPowered(faces[1]) || info.isPowered(faces[0].getOppositeFace());
                 if (pow1 && !pow2) {
-                    this.instruction = FaceUtil.combine(face_x, face_z);
+                    this.instruction = FaceUtil.combine(faces[0], faces[1].getOppositeFace());
                 } else if (!pow1 && pow2) {
-                    this.instruction = FaceUtil.combine(face_x.getOppositeFace(), face_z.getOppositeFace());
-                } else if (info.isPowered()) {
-                    this.instruction = BlockFace.SELF;
-                } else {
-                    this.instruction = null;
-                }
-            } else if (Math.abs(railDirection.getX()) > Math.abs(railDirection.getZ())) {
-                // Along X
-                boolean west = info.isPowered(BlockFace.WEST);
-                boolean east = info.isPowered(BlockFace.EAST);
-                if (west && !east) {
-                    this.instruction = BlockFace.WEST;
-                } else if (east && !west) {
-                    this.instruction = BlockFace.EAST;
+                    this.instruction = FaceUtil.combine(faces[0].getOppositeFace(), faces[1]);
                 } else if (info.isPowered()) {
                     this.instruction = BlockFace.SELF;
                 } else {
                     this.instruction = null;
                 }
             } else {
-                // Along Z
-                boolean north = info.isPowered(BlockFace.NORTH);
-                boolean south = info.isPowered(BlockFace.SOUTH);
-                if (north && !south) {
-                    this.instruction = BlockFace.NORTH;
-                } else if (south && !north) {
-                    this.instruction = BlockFace.SOUTH;
-                } else if (info.isPowered()) {
-                    this.instruction = BlockFace.SELF;
+                // Which directions to move, or brake?
+                if (FaceUtil.isAlongX(this.railDirection)) {
+                    boolean west = info.isPowered(BlockFace.WEST);
+                    boolean east = info.isPowered(BlockFace.EAST);
+                    if (west && !east) {
+                        this.instruction = BlockFace.WEST;
+                    } else if (east && !west) {
+                        this.instruction = BlockFace.EAST;
+                    } else if (info.isPowered()) {
+                        this.instruction = BlockFace.SELF;
+                    } else {
+                        this.instruction = null;
+                    }
+                } else if (FaceUtil.isAlongZ(this.railDirection)) {
+                    boolean north = info.isPowered(BlockFace.NORTH);
+                    boolean south = info.isPowered(BlockFace.SOUTH);
+                    if (north && !south) {
+                        this.instruction = BlockFace.NORTH;
+                    } else if (south && !north) {
+                        this.instruction = BlockFace.SOUTH;
+                    } else if (info.isPowered()) {
+                        this.instruction = BlockFace.SELF;
+                    } else {
+                        this.instruction = null;
+                    }
                 } else {
+                    this.launchConfig = LauncherConfig.createDefault();
                     this.instruction = null;
+                    this.valid = false;
+                    return;
                 }
             }
         }
