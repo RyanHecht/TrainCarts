@@ -163,12 +163,6 @@ public class VirtualEntity {
         this.posSet = true;
     }
 
-    public void setRelativeOffset(Vector offset) {
-        this.relDx = offset.getX();
-        this.relDy = offset.getY();
-        this.relDz = offset.getZ();
-    }
-
     public void setRelativeOffset(double dx, double dy, double dz) {
         this.relDx = dx;
         this.relDy = dy;

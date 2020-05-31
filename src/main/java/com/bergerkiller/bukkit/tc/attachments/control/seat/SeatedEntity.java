@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.tc.attachments.control.seat;
 
-import java.util.function.Consumer;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -25,8 +23,6 @@ public class SeatedEntity {
     private int _fakeEntityId = -1;
     private boolean _fake = false;
     private boolean _upsideDown = false;
-    private DisplayMode _displayMode = DisplayMode.DEFAULT;
-    public final SeatOrientation orientation = new SeatOrientation();
 
     /**
      * Gets whether this seat is empty
@@ -62,14 +58,6 @@ public class SeatedEntity {
      */
     public void setEntity(Entity entity) {
         this._entity = entity;
-    }
-
-    public DisplayMode getDisplayMode() {
-        return this._displayMode;
-    }
-
-    public void setDisplayMode(DisplayMode displayMode) {
-        this._displayMode = displayMode;
     }
 
     /**
@@ -142,9 +130,9 @@ public class SeatedEntity {
         PacketUtil.sendPacket(viewer, PacketPlayOutEntityMetadataHandle.createNew(this._entity.getEntityId(), metaTmp, true));
     }
 
-    public void makeVisible(Player viewer, boolean fake, int mountEntityId) {
+    public void makeVisible(Player viewer, int mountEntityId) {
         VehicleMountController vmh = PlayerUtil.getVehicleMountController(viewer);
-        if (this._fake && fake) {
+        if (this._fake) {
             // Despawn/hide original player entity
             if (this._entity == viewer) {
                 // Sync to self: make the real player invisible using a metadata change
@@ -158,17 +146,10 @@ public class SeatedEntity {
             }
 
             // Respawn an upside-down player in its place
-            Consumer<DataWatcher> metaFunction = metadata -> {
-                if (_displayMode == DisplayMode.ELYTRA || _displayMode == DisplayMode.ELYTRA_SIT) {
-                    metadata.setFlag(EntityHandle.DATA_FLAGS, EntityHandle.DATA_FLAG_FLYING, true);
-                } else {
-                    metadata.setFlag(EntityHandle.DATA_FLAGS, EntityHandle.DATA_FLAG_FLYING, false);
-                }
-            };
             if (this._upsideDown) {
-                ProfileNameModifier.UPSIDEDOWN.spawnPlayer(viewer, (Player) this._entity, this._fakeEntityId, this.orientation, metaFunction);
+                ProfileNameModifier.UPSIDEDOWN.spawnPlayer(viewer, (Player) this._entity, this._fakeEntityId);
             } else {
-                ProfileNameModifier.NO_NAMETAG.spawnPlayer(viewer, (Player) this._entity, this._fakeEntityId, this.orientation, metaFunction);
+                ProfileNameModifier.NO_NAMETAG.spawnPlayer(viewer, (Player) this._entity, this._fakeEntityId);
             }
 
             // Unmount from the original vehicle and mount the new fake entity instead
@@ -183,8 +164,8 @@ public class SeatedEntity {
         }
     }
 
-    public void makeHidden(Player viewer, boolean fake) {
-        if (this._fake && fake) {
+    public void makeHidden(Player viewer) {
+        if (this._fake) {
             // Despawn the fake player entity
             if (isPlayer()) {
                 // Destroy old fake player entity
@@ -198,7 +179,7 @@ public class SeatedEntity {
                     ProfileNameModifier.NORMAL.sendListInfo(viewer, (Player) this._entity);
                 } else {
                     // Respawns the player as a normal player
-                    ProfileNameModifier.NORMAL.spawnPlayer(viewer, (Player) this._entity, this._entity.getEntityId(), null, meta -> {});
+                    ProfileNameModifier.NORMAL.spawnPlayer(viewer, (Player) this._entity, this._entity.getEntityId());
                 }
             }
         }
@@ -209,11 +190,4 @@ public class SeatedEntity {
             PlayerUtil.getVehicleMountController(viewer).remove(this._entity.getEntityId());
         }
     }
-
-    public static enum DisplayMode {
-        DEFAULT, /* Player is displayed either upright or upside-down in a cart */
-        ELYTRA_SIT, /* Player is in sitting pose while flying in an elytra */
-        ELYTRA /* Player is in elytra flying pose */
-    }
 }
-
