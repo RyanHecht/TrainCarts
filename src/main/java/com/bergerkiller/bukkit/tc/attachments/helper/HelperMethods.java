@@ -100,33 +100,25 @@ public class HelperMethods {
         // Apply local transformation
         state.curr_transform.multiply(state.position.transform);
 
-        // Go to next animation when end of animation is reached (or no animation is playing)
-        if (!state.nextAnimationQueue.isEmpty() && (state.currentAnimation == null || state.currentAnimation.hasReachedEnd())) {
-            state.currentAnimation = state.nextAnimationQueue.remove(0);
-            state.currentAnimation.start();
-        }
+        // Animation is performed on the attachment itself (not the relative position)
+        if (state.currentAnimation != null) {
+            // Swap out animation when end is reached and more are queued
+            if (!state.nextAnimationQueue.isEmpty() && state.currentAnimation.hasReachedEnd()) {
+                state.currentAnimation = state.nextAnimationQueue.remove(0);
+                state.currentAnimation.start();
+            }
 
-        // If animation was reset (disabled), erase any previous animation state we had
-        // If one is running, then refresh the last animation state to apply to this transform
-        // If this method returns null, then we keep whatever state we were in prior
-        if (state.currentAnimation == null) {
-            state.lastAnimationState = null;
-        } else if (!state.currentAnimation.hasReachedEnd()) {
+            // Update current animation
             // TODO: Do we need dt here?
             double dt = ((CartAttachment) attachment).getController().getAnimationDeltaTime();
             AnimationNode animNode = state.currentAnimation.update(dt);
             if (animNode != null) {
-                state.lastAnimationState = animNode;
-            }
-        }
-
-        // Apply animation state from current or previous animation to the transformation
-        if (state.lastAnimationState != null) {
-            // Refresh active changes
-            boolean active = state.lastAnimationState.isActive();
-            state.lastAnimationState.apply(state.curr_transform);
-            if (active != attachment.isActive()) {
-                update_state.pendingActiveChanges.add(new AbstractMap.SimpleEntry<Attachment, Boolean>(attachment, active));
+                // Refresh active changes
+                boolean active = animNode.isActive();
+                animNode.apply(state.curr_transform);
+                if (active != attachment.isActive()) {
+                    update_state.pendingActiveChanges.add(new AbstractMap.SimpleEntry<Attachment, Boolean>(attachment, active));
+                }
             }
         }
 
