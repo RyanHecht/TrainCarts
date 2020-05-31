@@ -985,7 +985,7 @@ public abstract class MinecartMember<T extends CommonMinecart<?>> extends Entity
             toMove = 0.0;
         } else {
             pos = RailPath.Position.fromTo(this.preMovePosition, currPos);
-            toMove = pos.motLength();
+            toMove = MathUtil.length(pos.motX, pos.motY, pos.motZ);
         }
 
         // When movement is large, teleport is almost certain
