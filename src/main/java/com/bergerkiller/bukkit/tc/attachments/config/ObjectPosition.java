@@ -33,47 +33,24 @@ public class ObjectPosition {
     }
 
     /**
-     * Gets whether the position specifies a default behavior of attaching to the parent attachment
-     * 
-     * @param config
-     * @return True if seat default behavior is active
-     */
-    public static boolean isDefaultSeatParent(ConfigurationNode config) {
-        if (!config.isEmpty()) {
-            if (config.contains("anchor")) {
-                AttachmentAnchor anchor = AttachmentAnchor.find(config.get("anchor", AttachmentAnchor.DEFAULT.getName()));
-                if (anchor == AttachmentAnchor.SEAT_PARENT) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Loads the position from the configuration specified
      * 
      * @param config
      */
     public void load(ConfigurationNode config) {
-        if (!config.isEmpty()) {
+        if (config.isEmpty()) {
+            this.reset();
+        } else {
+            this._isDefault = false;
+            this.position.x = config.get("posX", 0.0);
+            this.position.y = config.get("posY", 0.0);
+            this.position.z = config.get("posZ", 0.0);
+            this.rotation.x = config.get("rotX", 0.0);
+            this.rotation.y = config.get("rotY", 0.0);
+            this.rotation.z = config.get("rotZ", 0.0);
             this.anchor = AttachmentAnchor.find(config.get("anchor", AttachmentAnchor.DEFAULT.getName()));
-            if (this.anchor != AttachmentAnchor.SEAT_PARENT) {
-                this._isDefault = false;
-                this.position.x = config.get("posX", 0.0);
-                this.position.y = config.get("posY", 0.0);
-                this.position.z = config.get("posZ", 0.0);
-                this.rotation.x = config.get("rotX", 0.0);
-                this.rotation.y = config.get("rotY", 0.0);
-                this.rotation.z = config.get("rotZ", 0.0);
-                this.initTransform();
-                return;
-            }
+            this.initTransform();
         }
-
-        // Default (seat in parent or 0/0/0)
-        this.reset();
     }
 
     /**

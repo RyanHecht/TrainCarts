@@ -5,7 +5,6 @@ import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapEventPropagation;
 import com.bergerkiller.bukkit.tc.attachments.api.AttachmentAnchor;
 import com.bergerkiller.bukkit.tc.attachments.config.ItemTransformType;
-import com.bergerkiller.bukkit.tc.attachments.config.ObjectPosition;
 import com.bergerkiller.bukkit.tc.attachments.control.CartAttachmentItem;
 import com.bergerkiller.bukkit.tc.attachments.ui.MapWidgetAttachmentNode;
 import com.bergerkiller.bukkit.tc.attachments.ui.MapWidgetMenu;
@@ -217,12 +216,11 @@ public class PositionMenu extends MapWidgetMenu {
         }
 
         ConfigurationNode config = getConfig();
-        boolean wasDefaultPosition = ObjectPosition.isDefaultSeatParent(config);
+        boolean wasDefaultPosition = config.isEmpty();
 
         config.set(key, value);
 
-        // Reload the entire model when changing 'seat default' rules
-        if (wasDefaultPosition != ObjectPosition.isDefaultSeatParent(config)) {
+        if (wasDefaultPosition) {
             sendStatusChange(MapEventPropagation.DOWNSTREAM, "changed");
         } else {
             sendStatusChange(MapEventPropagation.DOWNSTREAM, "changed", attachment);
