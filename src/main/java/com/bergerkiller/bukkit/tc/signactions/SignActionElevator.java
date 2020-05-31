@@ -17,6 +17,7 @@ import java.util.Locale;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.material.Directional;
 
 public class SignActionElevator extends SignAction {
     public static BlockTimeoutMap ignoreTimes = new BlockTimeoutMap();
@@ -51,7 +52,7 @@ public class SignActionElevator extends SignAction {
     }
 
     public static BlockFace getSpawnDirection(Block destrail) {
-        return getSpawnDirection(destrail, FaceUtil.getFaces(Util.getRailsRO(destrail).getDirection().getOppositeFace()));
+        return getSpawnDirection(destrail, FaceUtil.getFaces(BlockUtil.getRails(destrail).getDirection().getOppositeFace()));
     }
 
     public static BlockFace getSpawnDirection(Block destrail, BlockFace[] possible) {

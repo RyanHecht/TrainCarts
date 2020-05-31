@@ -7,7 +7,6 @@ import org.bukkit.material.Rails;
 
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.bukkit.tc.Util;
 import com.bergerkiller.bukkit.tc.utils.PoweredTrackLogic;
 
 public class RailTypeActivator extends RailTypeRegular {
@@ -26,7 +25,7 @@ public class RailTypeActivator extends RailTypeRegular {
         super.onBlockPlaced(railsBlock);
 
         // Also apply physics on the blocks adjacent for power to spread correctly
-        Rails rails = Util.getRailsRO(railsBlock);
+        Rails rails = BlockUtil.getRails(railsBlock);
         if (rails != null && isUpsideDown(railsBlock)) {
             BlockUtil.applyPhysics(railsBlock.getRelative(rails.getDirection()), Material.ACTIVATOR_RAIL);
             BlockUtil.applyPhysics(railsBlock.getRelative(rails.getDirection().getOppositeFace()), Material.ACTIVATOR_RAIL);

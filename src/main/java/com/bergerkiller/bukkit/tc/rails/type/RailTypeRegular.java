@@ -124,7 +124,7 @@ public class RailTypeRegular extends RailTypeHorizontal {
             return false;
         }
 
-        Rails rails = Util.getRailsRO(railsBlock);
+        Rails rails = BlockUtil.getRails(railsBlock);
         return rails != null && rails.isOnSlope() && rails.getDirection() == direction;
     }
 
@@ -153,7 +153,7 @@ public class RailTypeRegular extends RailTypeHorizontal {
         }
 
         if (rails == null) {
-            rails = Util.getRailsRO(railsBlock);
+            rails = BlockUtil.getRails(railsBlock);
         }
         if (rails == null) {
             return false;
@@ -280,7 +280,7 @@ public class RailTypeRegular extends RailTypeHorizontal {
 
     @Override
     public BlockFace[] getPossibleDirections(Block trackBlock) {
-        Rails rails = Util.getRailsRO(trackBlock);
+        Rails rails = BlockUtil.getRails(trackBlock);
         if (rails == null) {
             return new BlockFace[0];
         } else if (rails.isOnSlope() && Util.isVerticalAbove(trackBlock, rails.getDirection())) {
@@ -292,7 +292,7 @@ public class RailTypeRegular extends RailTypeHorizontal {
 
     @Override
     public List<RailJunction> getJunctions(Block railBlock) {
-        Rails rails = Util.getRailsRO(railBlock);
+        Rails rails = BlockUtil.getRails(railBlock);
         if (rails == null || rails.isOnSlope()) {
             return super.getJunctions(railBlock);
         }
@@ -367,7 +367,7 @@ public class RailTypeRegular extends RailTypeHorizontal {
 
     @Override
     public RailLogic getLogic(RailState state) {
-        Rails rails = Util.getRailsRO(state.railBlock());
+        Rails rails = BlockUtil.getRails(state.railBlock());
         if (rails == null) {
             return RailLogicGround.INSTANCE;
         }
@@ -376,13 +376,13 @@ public class RailTypeRegular extends RailTypeHorizontal {
 
     @Override
     public BlockFace getDirection(Block railsBlock) {
-        Rails rails = Util.getRailsRO(railsBlock);
+        Rails rails = BlockUtil.getRails(railsBlock);
         return rails == null ? BlockFace.SELF : rails.getDirection();
     }
 
     @Override
     public Location getSpawnLocation(Block railsBlock, BlockFace orientation) {
-        Rails rails = Util.getRailsRO(railsBlock);
+        Rails rails = BlockUtil.getRails(railsBlock);
         BlockFace dir = FaceUtil.getRailsCartDirection(rails.getDirection());
         if (FaceUtil.getFaceYawDifference(dir.getOppositeFace(), orientation) < 90) {
             dir = dir.getOppositeFace();
@@ -399,7 +399,7 @@ public class RailTypeRegular extends RailTypeHorizontal {
 
     @Override
     public RailsTexture getRailsTexture(Block railsBlock) {
-        Rails rails = Util.getRailsRO(railsBlock);
+        Rails rails = BlockUtil.getRails(railsBlock);
         if (rails == null) {
             return super.getRailsTexture(railsBlock);
         }
