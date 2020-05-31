@@ -19,7 +19,7 @@ public class SignActionTicket extends SignAction {
 
     @Override
     public boolean match(SignActionEvent info) {
-        return info.isType("ticket");
+        return info.isType("ticket") && info.getMode() != SignActionMode.NONE;
     }
 
     @Override
