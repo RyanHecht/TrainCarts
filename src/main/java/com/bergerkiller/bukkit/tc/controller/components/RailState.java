@@ -352,6 +352,7 @@ public class RailState {
     /**
      * Queries the rail type for the rail logic to use with this rail state
      * 
+     * @param member hint for the logic, null to ignore
      * @return Rail Logic
      */
     public RailLogic loadRailLogic() {
