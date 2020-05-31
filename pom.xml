@@ -235,23 +235,31 @@
                 </executions>
             </plugin>
 
-            <!-- Copy the produced target to the static directory with just a base name -->
+            <!-- Copy artifacts to non-versioned jar name -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
-                    <!-- Prepare the version-less output jar -->
                     <execution>
-                        <id>version-less-jar</id>
+                        <id>copy</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <target>
-                                <copy file="target/${project.name}-${project.version}.jar" tofile="target/static/${project.name}.jar"/>
-                            </target>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.bergerkiller.bukkit</groupId>
+                                    <artifactId>TrainCarts</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <destFileName>${project.name}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                         </configuration>
                     </execution>
                 </executions>
