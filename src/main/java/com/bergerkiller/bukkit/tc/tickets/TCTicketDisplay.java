@@ -16,24 +16,15 @@ public class TCTicketDisplay extends MapDisplay {
         this.setSessionMode(MapSessionMode.VIEWING);
         this.setGlobal(false);
 
-        renderBackground();
+        MapTexture bg = this.loadTexture("com/bergerkiller/bukkit/tc/textures/tickets/train_ticket_bg.png");
+        this.getLayer().draw(bg, 0, 0);
+
         renderTicket();
     }
 
     @Override
     public void onMapItemChanged() {
         this.renderTicket();
-    }
-
-    public void renderBackground() {
-        Ticket ticket = TicketStore.getTicketFromItem(this.getMapItem());
-        MapTexture bg;
-        if (ticket == null) {
-            bg = Ticket.getDefaultBackgroundImage();
-        } else {
-            bg = ticket.loadBackgroundImage();
-        }
-        this.getLayer().draw(bg, 0, 0);
     }
 
     private void renderTicket() {
