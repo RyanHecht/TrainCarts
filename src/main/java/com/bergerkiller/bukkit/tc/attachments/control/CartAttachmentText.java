@@ -72,6 +72,8 @@ public class CartAttachmentText extends CartAttachment {
                 @Override
                 public void onActivate() {
                     textBox.activate();
+                    sendStatusChange(MapEventPropagation.DOWNSTREAM, "changed");
+                    attachment.resetIcon();
                 }
             }).setBounds(0, 60, 100, 16);
         }
