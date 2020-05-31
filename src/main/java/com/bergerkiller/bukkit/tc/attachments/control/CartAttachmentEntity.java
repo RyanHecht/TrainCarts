@@ -119,9 +119,6 @@ public class CartAttachmentEntity extends CartAttachment {
                     } else {
                         nametag.set("used", true);
                         nametag.set("visible", true);
-                        if (!nametag.contains("text")) {
-                            nametag.set("text", "Nametag");
-                        }
                     }
                     refreshText();
                     sendStatusChange(MapEventPropagation.DOWNSTREAM, "changed");
