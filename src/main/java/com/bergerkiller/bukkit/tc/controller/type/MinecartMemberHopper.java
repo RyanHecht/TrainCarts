@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.tc.controller.type;
 
-import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
@@ -39,12 +38,6 @@ public class MinecartMemberHopper extends MinecartMember<CommonMinecartHopper> {
                 entity.update();
             }
         }
-    }
-
-    @Override
-    public void onBlockChange(Block from, Block to) {
-        super.onBlockChange(from, to);
-        entity.setSuckingCooldown(0);
     }
 
     @Override
