@@ -1,8 +1,7 @@
 package com.bergerkiller.bukkit.tc.statements;
 
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.tc.Direction;
-import com.bergerkiller.bukkit.tc.Util;
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 import com.bergerkiller.bukkit.tc.controller.MinecartMember;
 import com.bergerkiller.bukkit.tc.events.SignActionEvent;
@@ -12,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.block.BlockFace;
+import org.bukkit.util.Vector;
 
 public class StatementDirection extends Statement {
 
@@ -60,14 +60,20 @@ public class StatementDirection extends Statement {
         }
 
         // Find movement vector of Minecart
-        BlockFace enterFace;
+        Vector movement;
         if (event.getMember() == member) {
-            enterFace = event.getCartEnterFace();
+            movement = event.getCartEnterDirection();
         } else {
-            enterFace = Util.vecToFace(member.getEntity().getVelocity(), false);
+            movement = member.getEntity().getVelocity();
         }
 
         // Check if faces contains the current movement direction of the Minecart
-        return LogicUtil.contains(enterFace, faces);
+        for (BlockFace face : faces) {
+            if (MathUtil.isHeadingTo(face, movement)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
