@@ -40,21 +40,25 @@ public class RailSignCache {
      * @return array of valid rails at a rails block position
      */
     public static TrackedSign[] getSigns(RailType railType, Block railBlock) {
-        CachedRailKey in_key = new CachedRailKey(railType, railBlock);
-        CachedRailSignList list = cachedRailSigns.computeIfAbsent(in_key,
-                key -> new CachedRailSignList(discoverSigns(key.railType, key.railBlock)));
-
-        // If more than a tick old, verify the signs, and re-discover if incorrect
-        if (list.life > 0) {
-            if (verifySigns(list.signs)) {
-                list.life = 0;
+        CachedRailKey key = new CachedRailKey(railType, railBlock);
+        CachedRailSignList cached = cachedRailSigns.get(key);
+        if (cached != null && cached.life > 0) {
+            // Verify all the signs mentioned are still there
+            // If still valid, reset life, otherwise regenerate
+            if (verifySigns(cached.signs)) {
+                cached.life = 0;
             } else {
-                list = new CachedRailSignList(discoverSigns(in_key.railType, in_key.railBlock));
-                cachedRailSigns.put(in_key, list);
+                cached = null;
             }
         }
 
-        return list.signs;
+        // Regenerate if required
+        if (cached == null) {
+            cached = new CachedRailSignList(discoverSigns(key.railType, key.railBlock));
+            cachedRailSigns.put(key, cached);
+        }
+
+        return cached.signs;
     }
 
     /**

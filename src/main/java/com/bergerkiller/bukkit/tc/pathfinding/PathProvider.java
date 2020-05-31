@@ -169,7 +169,12 @@ public class PathProvider extends Task {
      * @return PathWorld instance for the world with worldName
      */
     public PathWorld getWorld(String worldName) {
-        return this.worlds.computeIfAbsent(worldName, name -> new PathWorld(this, name));
+        PathWorld world = this.worlds.get(worldName);
+        if (world == null) {
+            world = new PathWorld(this, worldName);
+            this.worlds.put(worldName, world);
+        }
+        return world;
     }
 
     /**

@@ -105,12 +105,14 @@ public class TrainPropertiesStore extends LinkedHashSet<CartProperties> {
      */
     public static TrainProperties get(String trainname) {
         if (trainname == null) return null;
-        return trainProperties.computeIfAbsent(trainname, key -> {
-            TrainProperties newProperties = new TrainProperties(key);
-            newProperties.setDefault();
+        TrainProperties prop = trainProperties.get(trainname);
+        if (prop == null) {
+            prop = new TrainProperties(trainname);
+            prop.setDefault();
+            trainProperties.put(trainname, prop);
             hasChanges = true;
-            return newProperties;
-        });
+        }
+        return prop;
     }
 
     /**

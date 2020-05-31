@@ -106,7 +106,12 @@ public class SignSkipOptions {
         this.hasSkippedSigns = false;
         Iterator<TrackedSign> iter = signs.iterator();
         while (iter.hasNext()) {
-            Boolean historyState = this.history.computeIfAbsent(iter.next(), sign -> {
+            TrackedSign sign = iter.next();
+            Boolean historyState = this.history.get(sign);
+
+            // Handle new signs being entered here
+            if (historyState == null) {
+                historyState = Boolean.FALSE;
                 boolean passFilter = true;
                 if (this.filter.length() > 0) {
                     if (sign.sign == null) {
@@ -120,11 +125,11 @@ public class SignSkipOptions {
                         this.ignoreCtr--;
                     } else if (this.skipCtr > 0) {
                         this.skipCtr--;
-                        return Boolean.TRUE;
+                        historyState = Boolean.TRUE;
                     }
                 }
-                return Boolean.FALSE;
-            });
+                this.history.put(sign, historyState);
+            }
 
             // When state is 'true', skip the sign
             if (historyState.booleanValue()) {
